@@ -53,8 +53,10 @@ def simulate_coincidence(m,s):
             else:
                 coincidencia = random.gauss(m,s)
                 print(coincidencia)
-                if coincidencia > 1:        coincidencia = 1
-                elif coincidencia < 0:      coincidencia = 0
+                if coincidencia > 1:        
+                    coincidencia = float(1)
+                elif coincidencia < 0:      
+                    coincidencia = float(0)
                 node1,node2 = linia.strip().split(",")
                 print(node1,node2,coincidencia)
                 G.add_weighted_edges_from(node1,node2,coincidencia)
