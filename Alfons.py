@@ -61,5 +61,34 @@ def simulate_coincidence(m,s):
                 
     return G
 
-Graf = simulate_coincidence(0.5, 0.25)
-draw_graph(Graf)
+"""Graf = simulate_coincidence(0.5, 0.25)
+draw_graph(Graf)"""
+
+import random
+
+def loto():
+    n = int(input("Introdueix quants números vols jugar: "))
+    m = int(input("Introdueix el màxim de valors possibles: "))
+
+    print(f"Introdueix {n} números entre 1 i {m} separats per espais:")
+    entrada = input("Els teus números: ")
+    jugada = list(map(int, entrada.strip().split()))
+
+    jugada = sorted(jugada)
+
+    intents = 0
+
+    while True:
+        sorteig = random.sample(range(1, m + 1), n)
+        intents += 1
+
+        print (f"El sorteig és: {sorteig}")
+
+        if sorted(sorteig) == jugada:
+            print("has guanyat!")
+            break
+        
+    print(f"Has necessitat {intents} intents per guanyar.")
+    print(f"Els teus números són: {jugada}")
+
+loto()
