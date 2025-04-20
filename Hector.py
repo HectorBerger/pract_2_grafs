@@ -87,8 +87,27 @@ def simulate_coincidence(m,s):
 
 def how_many_cliques(n,m,s):
     G = simulate_coincidence(m,s)
+    
+    # Filtrar aristas con peso mayor que n
+    filtered_edges = [(u, v) for u, v, data in G.edges(data=True) if data['weight'] > n]
+    G_filtered = nx.Graph(filtered_edges)
 
-#how_many_cliques(0.8,0.95,0.25)
+    # Encontrar todos los cliques
+    cliques = list(nx.find_cliques(G_filtered))
+
+    # Contar cliques por tamaño
+    clique_counts = {}
+    for clique in cliques:
+        size = len(clique)
+        if size not in clique_counts:
+            clique_counts[size] = 0
+        clique_counts[size] += 1
+
+    # Imprimir resultados
+    for size in sorted(clique_counts.keys()):
+        print(f"Número de cliques de tamaño {size}: {clique_counts[size]}")
+
+how_many_cliques(0.8,0.95,0.25)
 
 
 #2
@@ -123,6 +142,6 @@ def loto():
 
 #3
 
-G = build_lastgraph(NOMFITXER,10000000)
+G = build_lastgraph(NOMFITXER,1000)
 d = timer(nx.coloring.greedy_color, "Greedy Color (largest_first)")(G, strategy='largest_first', interchange=False)
 #print(d)
