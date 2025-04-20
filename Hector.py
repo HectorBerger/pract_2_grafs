@@ -3,10 +3,12 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import time
 
 #Simulació
-NOMFITXER = "graf_petit.csv" #graf_petit.csv lastfm_asia_edges.csv
+NOMFITXER = "lastfm_asia_edges.csv" #graf_petit.csv lastfm_asia_edges.csv
 
+#Other functions
 def draw_graph(G: nx.Graph):
     pos = nx.spring_layout(G, seed=42, k=0.3)  # Mejor disposición
 
@@ -44,6 +46,31 @@ def draw_graph(G: nx.Graph):
     plt.axis('off')  # Ocultar ejes
     plt.show()
 
+#Constructor de grafs a partir d'un fitxer d'arestes
+def build_lastgraph(NomFitxer:str, num_i:int = 27808) -> nx.Graph:
+    G=nx.Graph()
+    i=0
+    with open(NomFitxer) as f:
+        for linia in f.readlines()[1:]:
+            node1,node2 = linia.strip().split(",")
+            G.add_edge(node1,node2)
+            i+=1
+            if i > num_i:
+                break
+
+    return G
+
+#Funció Timer per calcular el temps d'execució d'una funció
+def timer(func, nom_funcio: str):
+    def wrapper(*args, **kwargs): #wrapper per poder executar la funció amb els paràmetres passats (tants com siguin necessaris)
+        start_time = time.time()
+        resultat = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"Temps d'execució {nom_funcio}: {end_time - start_time} segons")
+        return resultat #Retornarem el resultat de la funció i el temps que ha tardat en executar-se
+    return wrapper
+
+#1
 def simulate_coincidence(m,s):
     #random.seed(1751751)
     G=nx.Graph()
@@ -58,5 +85,44 @@ def simulate_coincidence(m,s):
             G.add_weighted_edges_from([(node1,node2,coincidencia)])       
     return G
 
-Graf = simulate_coincidence(0.5, 0.25)
-draw_graph(Graf)
+def how_many_cliques(n,m,s):
+    G = simulate_coincidence(m,s)
+
+#how_many_cliques(0.8,0.95,0.25)
+
+
+#2
+def loto():
+    n = int(input("Introdueix quants números vols jugar: "))
+    m = int(input("Introdueix el màxim de valors possibles: "))
+    
+    #NO FUNCIONA SI N > M . SE PUEDE ARREGLAR?
+    print(f"Introdueix {n} números entre 1 i {m} separats per espais:")
+    entrada = input("Els teus números: ") #HABRÍA QUE CONTROLAR EL INPUT (Que te vuelva a preguntar si lo has introducido mal)
+    jugada = list(map(int, entrada.strip().split()))
+
+    jugada = sorted(jugada)
+
+    intents = 0
+
+    while True:
+        sorteig = random.sample(range(1, m + 1), n)
+        intents += 1
+
+        print (f"El sorteig és: {sorteig}")
+
+        if sorted(sorteig) == jugada:
+            print("has guanyat!")
+            break
+        
+    print(f"Has necessitat {intents} intents per guanyar.")
+    print(f"Els teus números són: {jugada}")
+
+#loto()
+
+
+#3
+
+G = build_lastgraph(NOMFITXER,10000000)
+d = timer(nx.coloring.greedy_color, "Greedy Color (largest_first)")(G, strategy='largest_first', interchange=False)
+#print(d)
