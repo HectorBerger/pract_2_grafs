@@ -107,7 +107,7 @@ def how_many_cliques(n,m,s):
     for size in sorted(clique_counts.keys()):
         print(f"Número de cliques de tamaño {size}: {clique_counts[size]}")
 
-how_many_cliques(0.8,0.95,0.25)
+#how_many_cliques(0.8,0.95,0.25)
 
 
 #2
@@ -128,20 +128,20 @@ def loto():
         sorteig = random.sample(range(1, m + 1), n)
         intents += 1
 
-        print (f"El sorteig és: {sorteig}")
+        #print (f"El sorteig és: {sorteig}")
 
-        if sorted(sorteig) == jugada:
+        if sorteig == jugada:
             print("has guanyat!")
             break
         
     print(f"Has necessitat {intents} intents per guanyar.")
     print(f"Els teus números són: {jugada}")
 
-#loto()
+loto()
 
 
 #3
 
-G = build_lastgraph(NOMFITXER,1000)
-d = timer(nx.coloring.greedy_color, "Greedy Color (largest_first)")(G, strategy='largest_first', interchange=False)
+#G = build_lastgraph(NOMFITXER,1000)
+#d = timer(nx.coloring.greedy_color, "Greedy Color (largest_first)")(G, strategy='largest_first', interchange=False)
 #print(d)
