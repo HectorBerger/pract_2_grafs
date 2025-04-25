@@ -1,6 +1,7 @@
 #Prac_2
 import networkx as nx
 import random
+import time
 #Simulació
 NOMFITXER = "lastfm_asia_edges.csv"
 
@@ -95,4 +96,37 @@ def loto():
     print(f"Has necessitat {intents} intents per guanyar.")
     print(f"Els teus números són: {jugada}")
 
-loto()
+def build_lastgraph(NomFitxer:str) -> nx.Graph:
+    G=nx.Graph()
+    primera_linea = True
+    with open(NomFitxer) as f:
+        for linia in f:
+            if primera_linea:   primera_linea=False
+            else:
+                node1,node2 = linia.strip().split(",")
+                G.add_edge(node1,node2)
+    return G
+
+G = build_lastgraph(NOMFITXER)
+
+arestes = list(G.edges())
+
+estrategies = ['largest_first', 'random_sequential', 'smallest_last']
+num_arestes = [100, 300, 500, 1000, 3000, 5000, 7500]
+
+for estrategia in estrategies:
+    print("Estrategia:", estrategia)
+    for n in num_arestes:
+        # Crear subgraf amb les primeres n arestes
+        subgraf = nx.Graph()
+        subgraf.add_edges_from(arestes[:n])
+
+        # Aplicar greedy_color i mesurar temps
+        start_time = time.time()
+        coloracio = nx.coloring.greedy_color(subgraf, strategy=estrategia)
+        end_time = time.time()
+
+        temps = end_time - start_time
+        colors_usats = max(coloracio.values()) + 1  # +1 perquè els colors comencen a 0
+
+        print("Arestes:", n, "Colors:", colors_usats, "Temps:", temps)
