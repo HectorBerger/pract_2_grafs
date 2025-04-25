@@ -70,19 +70,23 @@ def loto():
     n = int(input("Introdueix quants números vols jugar: "))
     m = int(input("Introdueix el màxim de valors possibles: "))
 
-    print(f"Introdueix {n} números entre 1 i {m} separats per espais:")
-    entrada = input("Els teus números: ")
-    jugada = list(map(int, entrada.strip().split()))
+    Incorrecte = True
+    while Incorrecte:
+        print(f"Introdueix {n} números entre 1 i {m} separats per espais:")
+        entrada = input("Els teus números: ")
+        jugada = list(map(int, entrada.strip().split()))
+        if len(jugada) != n or any(num < 1 or num > m for num in jugada):
+            print("Error: Els teus numeros.")
+        
 
     jugada = sorted(jugada)
-
     intents = 0
 
     while True:
         sorteig = random.sample(range(1, m + 1), n)
         intents += 1
 
-        print (f"El sorteig és: {sorteig}")
+        #print (f"El sorteig és: {sorteig}")
 
         if sorted(sorteig) == jugada:
             print("has guanyat!")
