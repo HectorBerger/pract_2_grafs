@@ -1,76 +1,14 @@
 #Prac_2
 import networkx as nx
-import matplotlib.pyplot as plt
-import numpy as np
+from networkx.algorithms import clique
 import random
-import time
+from other_func import draw_graph, build_lastgraph, timer
 
 #Simulació
 NOMFITXER = "lastfm_asia_edges.csv" #graf_petit.csv lastfm_asia_edges.csv
 
-#Other functions
-def draw_graph(G: nx.Graph):
-    pos = nx.spring_layout(G, seed=42, k=0.3)  # Mejor disposición
 
-    plt.figure(figsize=(12, 8))  # Tamaño adecuado
-    ax = plt.gca()  # Obtener el objeto Axes actual
-
-    # Obtener pesos de aristas y normalizar
-    edges, weights = zip(*nx.get_edge_attributes(G, 'weight').items())
-    weights = np.array(weights)
-
-    # Mapa de colores para los pesos
-    cmap = plt.cm.coolwarm  # Paleta de colores
-    norm = plt.Normalize(vmin=0, vmax=1)  # Normalización del rango
-
-    # Dibujar nodos con colores según el componente conexo
-    components = list(nx.connected_components(G))
-    colors = plt.cm.tab20(range(len(components)))  # Diferentes colores por componente
-
-    for component, color in zip(components, colors):
-        nx.draw_networkx_nodes(G, pos, nodelist=component, node_color=[color], node_size=700, ax=ax)
-
-    # Dibujar aristas con color y grosor según el peso
-    nx.draw_networkx_edges(G, pos, edgelist=edges, edge_color=weights, edge_cmap=cmap, width=weights * 5, edge_vmin=0, edge_vmax=1, ax=ax)
-
-    # Dibujar etiquetas de nodos
-    nx.draw_networkx_labels(G, pos, font_size=10, ax=ax)
-
-    # Agregar barra de colores
-    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    sm.set_array([])
-    cbar = plt.colorbar(sm, ax=ax)
-    cbar.set_label("Peso de las aristas")
-
-    plt.title("Visualización del Grafo con Pesos de Aristas")
-    plt.axis('off')  # Ocultar ejes
-    plt.show()
-
-#Constructor de grafs a partir d'un fitxer d'arestes
-def build_lastgraph(NomFitxer:str, num_i:int = 27808) -> nx.Graph:
-    G=nx.Graph()
-    i=0
-    with open(NomFitxer) as f:
-        for linia in f.readlines()[1:]:
-            node1,node2 = linia.strip().split(",")
-            G.add_edge(node1,node2)
-            i+=1
-            if i > num_i:
-                break
-
-    return G
-
-#Funció Timer per calcular el temps d'execució d'una funció
-def timer(func, nom_funcio: str):
-    def wrapper(*args, **kwargs): #wrapper per poder executar la funció amb els paràmetres passats (tants com siguin necessaris)
-        start_time = time.time()
-        resultat = func(*args, **kwargs)
-        end_time = time.time()
-        print(f"Temps d'execució {nom_funcio}: {end_time - start_time} segons")
-        return resultat #Retornarem el resultat de la funció i el temps que ha tardat en executar-se
-    return wrapper
-
-#1
+#1 - Simulació - Cliques
 def simulate_coincidence(m,s):
     #random.seed(1751751)
     G=nx.Graph()
@@ -85,63 +23,96 @@ def simulate_coincidence(m,s):
             G.add_weighted_edges_from([(node1,node2,coincidencia)])       
     return G
 
-def how_many_cliques(n,m,s):
-    G = simulate_coincidence(m,s)
-    
-    # Filtrar aristas con peso mayor que n
-    filtered_edges = [(u, v) for u, v, data in G.edges(data=True) if data['weight'] > n]
-    G_filtered = nx.Graph(filtered_edges)
+def how_many_cliques(n, m, s):
+    G = simulate_coincidence(m, s)
 
-    # Encontrar todos los cliques
-    cliques = list(nx.find_cliques(G_filtered))
+    # Filtrar per llindar n
+    Gf = nx.Graph( [(u, v) for u, v, d in G.edges(data=True) if d['weight'] > n] )
 
-    # Contar cliques por tamaño
-    clique_counts = {}
-    for clique in cliques:
-        size = len(clique)
-        if size not in clique_counts:
-            clique_counts[size] = 0
-        clique_counts[size] += 1
+    # Enumerar tots els cliques
+    all_cliques = list(clique.enumerate_all_cliques(Gf))
 
-    # Imprimir resultados
-    for size in sorted(clique_counts.keys()):
-        print(f"Número de cliques de tamaño {size}: {clique_counts[size]}")
+    # Comptar per mida
+    counts = {}
+    for C in all_cliques:
+        k = len(C)
+        counts[k] = counts.get(k, 0) + 1
 
-#how_many_cliques(0.8,0.95,0.25)
+    # Mostrar resultats
+    for k in sorted(counts):
+        print(f"Nombre de cliques de mida {k}: {counts[k]}")
 
+"""
+#proves = [[0.1, 0.5, 0.25], [0.2, 0.5, 0.25], [0.5, 0.5, 0.25], [0.7, 0.5, 0.25], [0.8, 0.5, 0.25], [0.95, 0.5, 0.35], [1, 0.5, 0.25]] # Prova on només varia n (el nombre llindar de conexió) 
+proves = [[0.95, 0.1, 0.5], [0.95, 0.25, 0.5], [0.95, 0.5, 0.5], [0.95, 0.75, 0.5], [0.95, 1, 0.5]] #Prova per comprovar l'impacte de variar m (mitjana) amb els altres valors fixes
+#proves = [[0.95, 0.5, 0], [0.95, 0.5, 0.1], [0.95, 0.5, 0.25], [0.95, 0.5, 0.5], [0.95, 0.5, 1], [0.95, 0.5, 4]] #Prova per veure l'efecte de variar s (desviació típica) amb valor de n=0.95 i m=0.5
+for i,p in enumerate(proves):
+    timer(how_many_cliques, f"How many cliques? Prova: {i}", True)(p[0], p[1], p[2]) #n = p[0], m = p[1], s = p[2] 
+"""
 
-#2
-def loto():
+#2 - La loto n<m
+def loto() -> bool:
     n = int(input("Introdueix quants números vols jugar: "))
     m = int(input("Introdueix el màxim de valors possibles: "))
-    
-    #NO FUNCIONA SI N > M . SE PUEDE ARREGLAR?
-    print(f"Introdueix {n} números entre 1 i {m} separats per espais:")
-    entrada = input("Els teus números: ") #HABRÍA QUE CONTROLAR EL INPUT (Que te vuelva a preguntar si lo has introducido mal)
-    jugada = list(map(int, entrada.strip().split()))
+
+    if n > m:
+        print(f"Error: No pots triar {n} números diferents entre 1 i {m}.")
+        return False
+
+    correcte = False
+    while not correcte:
+        print(f"Introdueix {n} números entre 1 i {m} separats per espais:")
+        entrada = input("Els teus números: ")
+        try:
+            jugada = list(map(int, entrada.strip().split()))
+            if len(jugada) != n:
+                print("Error: has introduït un nombre incorrecte de números.")
+            elif any(num < 1 or num > m for num in jugada):
+                print(f"Error: Tots els números han d'estar entre 1 i {m}.")
+            elif len(set(jugada)) != n:
+                print("Error: Els números no poden estar repetits.")
+            else:
+                correcte = True
+        except ValueError:
+            print("Error: Has d'introduir números vàlids.")
 
     jugada = sorted(jugada)
-
     intents = 0
 
     while True:
         sorteig = random.sample(range(1, m + 1), n)
         intents += 1
 
-        #print (f"El sorteig és: {sorteig}")
-
-        if sorteig == jugada:
-            print("has guanyat!")
+        if sorted(sorteig) == jugada:
+            print("Has guanyat!")
             break
         
     print(f"Has necessitat {intents} intents per guanyar.")
     print(f"Els teus números són: {jugada}")
 
-loto()
+    return True
+
+#loto()
 
 
-#3
+#3 - Els Problemes de Coloració són NP-complets
+G = build_lastgraph(NOMFITXER)
 
-#G = build_lastgraph(NOMFITXER,1000)
-#d = timer(nx.coloring.greedy_color, "Greedy Color (largest_first)")(G, strategy='largest_first', interchange=False)
-#print(d)
+arestes = list(G.edges())
+
+estrategies = ['largest_first', 'random_sequential', 'smallest_last']
+num_arestes = [100, 300, 500, 1000, 3000, 5000, 7500]
+
+for estrategia in estrategies:
+    print("Estrategia:", estrategia)
+    for n in num_arestes:
+        # Crear subgraf amb les primeres n arestes
+        subgraf = nx.Graph()
+        subgraf.add_edges_from(arestes[:n])
+
+        # Aplicar greedy_color i mesurar temps
+        coloracio, temps = timer(nx.coloring.greedy_color, "estrategia", False)(subgraf, strategy=estrategia)
+
+        colors_usats = max(coloracio.values()) + 1  # +1 perquè els colors comencen a 0
+
+        print("Arestes:", n, "Colors:", colors_usats, "Temps:", temps)
