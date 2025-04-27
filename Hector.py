@@ -7,7 +7,7 @@ from other_func import draw_graph, build_lastgraph, timer
 NOMFITXER = "lastfm_asia_edges.csv" #graf_petit.csv lastfm_asia_edges.csv
 
 
-#1 - Simulació - Cliques
+##1 - Simulació - Cliques
 def simulate_coincidence(m,s):
     #random.seed(1751751)
     G=nx.Graph()
@@ -42,15 +42,16 @@ def how_many_cliques(n, m, s):
         print(f"Nombre de cliques de mida {k}: {counts[k]}")
 
 """
-#proves = [[0.1, 0.5, 0.25], [0.2, 0.5, 0.25], [0.5, 0.5, 0.25], [0.7, 0.5, 0.25], [0.8, 0.5, 0.25], [0.95, 0.5, 0.35], [1, 0.5, 0.25]] # Prova on només varia n (el nombre llindar de conexió) 
-proves = [[0.95, 0.1, 0.5], [0.95, 0.25, 0.5], [0.95, 0.5, 0.5], [0.95, 0.75, 0.5], [0.95, 1, 0.5]] #Prova per comprovar l'impacte de variar m (mitjana) amb els altres valors fixes
-#proves = [[0.95, 0.5, 0], [0.95, 0.5, 0.1], [0.95, 0.5, 0.25], [0.95, 0.5, 0.5], [0.95, 0.5, 1], [0.95, 0.5, 4]] #Prova per veure l'efecte de variar s (desviació típica) amb valor de n=0.95 i m=0.5
+proves = [[0.1, 0.5, 0.25], [0.2, 0.5, 0.25], [0.5, 0.5, 0.25], [0.7, 0.5, 0.25], [0.8, 0.5, 0.25], [0.95, 0.5, 0.35], [1, 0.5, 0.25]] # Proves on només varia n (el nombre llindar de conexió) 
+#proves = [[0.95, 0.1, 0.25], [0.95, 0.25, 0.25], [0.95, 0.5, 0.25], [0.95, 0.75, 0.25], [0.95, 1, 0.25]] #Proves per comprovar l'impacte de variar m (mitjana) amb els altres valors fixes
+#proves = [[0.95, 0.5, 0], [0.95, 0.5, 0.1], [0.95, 0.5, 0.25], [0.95, 0.5, 0.5], [0.95, 0.5, 1], [0.95, 0.5, 4], [0.95, 0.5, 100]] #Proves per veure l'efecte de variar s (desviació típica) amb valor de n=0.95 i m=0.5
+#proves = [[0.8, 0.5, 0.1], [0.1,0,0.05], [0.8,1,100], [0.95,0.5,0.5]] #Altres proves que hem utilitzat també
 for i,p in enumerate(proves):
-    timer(how_many_cliques, f"How many cliques? Prova: {i}", True)(p[0], p[1], p[2]) #n = p[0], m = p[1], s = p[2] 
+    print(f"\nProva {i}")
+    timer(how_many_cliques, f"How many cliques? Provas {i}", True)(p[0], p[1], p[2]) #n = p[0], m = p[1], s = p[2] 
 """
 
-
-#2 - La loto n<m
+##2 - La loto n<m
 def loto() -> bool:
     n = int(input("Introdueix quants números vols jugar: "))
     m = int(input("Introdueix el màxim de valors possibles: "))
@@ -92,16 +93,15 @@ def loto() -> bool:
 
     return True
 
-#loto()
+#timer(loto, "Loteria", True)()
 
 
-#3 - Els Problemes de Coloració són NP-complets
-"""
+##3 - Els Problemes de Coloració són NP-complets
 G = build_lastgraph(NOMFITXER)
 
 arestes = list(G.edges())
 
-estrategies = ['largest_first', 'random_sequential', 'smallest_last']
+estrategies = ['largest_first', 'random_sequential', 'smallest_last', 'independent_set', 'connected_sequential_bfs', 'connected_sequential_dfs', 'saturation_largest_first']
 num_arestes = [100, 300, 500, 1000, 3000, 5000, 7500, 10000, 15000, 27806]
 
 for estrategia in estrategies:
@@ -111,10 +111,9 @@ for estrategia in estrategies:
         subgraf = nx.Graph()
         subgraf.add_edges_from(arestes[:n])
 
-        # Aplicar greedy_color i mesurar temps
+        # Aplicar greedy_color i mesurar temps amb timer
         coloracio, temps = timer(nx.coloring.greedy_color, "estrategia", False)(subgraf, strategy=estrategia)
 
         colors_usats = max(coloracio.values()) + 1  # +1 perquè els colors comencen a 0
 
         print("Arestes:", n, "Colors:", colors_usats, "Temps:", temps)
-"""
