@@ -9,17 +9,20 @@ NOMFITXER = "lastfm_asia_edges.csv" #graf_petit.csv lastfm_asia_edges.csv
 
 ##1 - Simulació - Cliques
 def simulate_coincidence(m,s):
-    #random.seed(1751751)
+    #random.seed(1751751) #Utilitzar en el cas que volem que totes les coincidencies siguin sempre iguals, serveix en el cas de comparar temps 
     G=nx.Graph()
     with open(NOMFITXER) as f:
         for linia in f.readlines()[1:]:
-            coincidencia = random.gauss(m,s)
+            #Generar aleatoriament el pes de les arestes per crear el graf i controlar que no es passi dels limits 0 i 1
+            coincidencia = random.gauss(m,s) 
             if coincidencia > 1:        
                 coincidencia = 1
             elif coincidencia < 0:      
                 coincidencia = 0
             node1,node2 = linia.strip().split(",")
-            G.add_weighted_edges_from([(node1,node2,coincidencia)])       
+            G.add_weighted_edges_from([(node1,node2,coincidencia)])  
+
+    #draw_graph(G) #S'ha utilitzat per dibuixar els pessos de les arestes en el cas del graf_petit.csv     
     return G
 
 def how_many_cliques(n, m, s):
@@ -41,7 +44,7 @@ def how_many_cliques(n, m, s):
     for k in sorted(counts):
         print(f"Nombre de cliques de mida {k}: {counts[k]}")
 
-"""
+#"""
 proves = [[0.1, 0.5, 0.25], [0.2, 0.5, 0.25], [0.5, 0.5, 0.25], [0.7, 0.5, 0.25], [0.8, 0.5, 0.25], [0.95, 0.5, 0.35], [1, 0.5, 0.25]] # Proves on només varia n (el nombre llindar de conexió) 
 #proves = [[0.95, 0.1, 0.25], [0.95, 0.25, 0.25], [0.95, 0.5, 0.25], [0.95, 0.75, 0.25], [0.95, 1, 0.25]] #Proves per comprovar l'impacte de variar m (mitjana) amb els altres valors fixes
 #proves = [[0.95, 0.5, 0], [0.95, 0.5, 0.1], [0.95, 0.5, 0.25], [0.95, 0.5, 0.5], [0.95, 0.5, 1], [0.95, 0.5, 4], [0.95, 0.5, 100]] #Proves per veure l'efecte de variar s (desviació típica) amb valor de n=0.95 i m=0.5
@@ -49,13 +52,14 @@ proves = [[0.1, 0.5, 0.25], [0.2, 0.5, 0.25], [0.5, 0.5, 0.25], [0.7, 0.5, 0.25]
 for i,p in enumerate(proves):
     print(f"\nProva {i}")
     timer(how_many_cliques, f"How many cliques? Provas {i}", True)(p[0], p[1], p[2]) #n = p[0], m = p[1], s = p[2] 
-"""
+#"""
 
 ##2 - La loto n<m
 def loto() -> bool:
     n = int(input("Introdueix quants números vols jugar: "))
     m = int(input("Introdueix el màxim de valors possibles: "))
 
+    #Controlar que n sigui més petita que m
     if n > m:
         print(f"Error: No pots triar {n} números diferents entre 1 i {m}.")
         return False
@@ -97,6 +101,7 @@ def loto() -> bool:
 
 
 ##3 - Els Problemes de Coloració són NP-complets
+"""
 G = build_lastgraph(NOMFITXER)
 
 arestes = list(G.edges())
@@ -117,3 +122,4 @@ for estrategia in estrategies:
         colors_usats = max(coloracio.values()) + 1  # +1 perquè els colors comencen a 0
 
         print("Arestes:", n, "Colors:", colors_usats, "Temps:", temps)
+"""
