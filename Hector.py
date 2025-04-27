@@ -1,10 +1,9 @@
-#Prac_2
+#Pràctica_2
 import networkx as nx
 from networkx.algorithms import clique
 import random
 from other_func import draw_graph, build_lastgraph, timer
 
-#Simulació
 NOMFITXER = "lastfm_asia_edges.csv" #graf_petit.csv lastfm_asia_edges.csv
 
 
@@ -49,6 +48,7 @@ proves = [[0.95, 0.1, 0.5], [0.95, 0.25, 0.5], [0.95, 0.5, 0.5], [0.95, 0.75, 0.
 for i,p in enumerate(proves):
     timer(how_many_cliques, f"How many cliques? Prova: {i}", True)(p[0], p[1], p[2]) #n = p[0], m = p[1], s = p[2] 
 """
+
 
 #2 - La loto n<m
 def loto() -> bool:
@@ -96,15 +96,16 @@ def loto() -> bool:
 
 
 #3 - Els Problemes de Coloració són NP-complets
+"""
 G = build_lastgraph(NOMFITXER)
 
 arestes = list(G.edges())
 
 estrategies = ['largest_first', 'random_sequential', 'smallest_last']
-num_arestes = [100, 300, 500, 1000, 3000, 5000, 7500]
+num_arestes = [100, 300, 500, 1000, 3000, 5000, 7500, 10000, 15000, 27806]
 
 for estrategia in estrategies:
-    print("Estrategia:", estrategia)
+    print("\nEstrategia:", estrategia)
     for n in num_arestes:
         # Crear subgraf amb les primeres n arestes
         subgraf = nx.Graph()
@@ -116,3 +117,4 @@ for estrategia in estrategies:
         colors_usats = max(coloracio.values()) + 1  # +1 perquè els colors comencen a 0
 
         print("Arestes:", n, "Colors:", colors_usats, "Temps:", temps)
+"""
